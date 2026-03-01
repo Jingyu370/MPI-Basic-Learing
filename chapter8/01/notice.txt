@@ -1,0 +1,11 @@
+进程 ID	第一段操作	第二段操作
+0	执行 MPI_Recv(来自1)	执行 MPI_Send(给1)
+1	执行 MPI_Recv(来自2) + MPI_Send(给0)	执行 MPI_Send(给2) + MPI_Recv(来自0)
+2	执行 MPI_Recv(来自3) + MPI_Send(给1)	执行 MPI_Send(给3) + MPI_Recv(来自1)
+3	不执行 Recv + 执行 MPI_Send(给2)	不执行 Send + 执行 MPI_Recv(来自2)
+“没立刻死锁” 的偶然原因：
+进程 3 是 “特殊的”：第一段它不执行 Recv，直接执行 Send（给进程 2），这就给进程 2 的第一段 Recv（来自 3）提供了数据；
+进程 2 拿到进程 3 的 Send 数据后，完成第一段 Recv，再执行第一段 Send（给进程 1）；
+进程 1 拿到进程 2 的 Send 数据后，完成第一段 Recv，再执行第一段 Send（给进程 0）；
+进程 0 拿到进程 1 的 Send 数据后，完成第一段 Recv，再执行第二段 Send（给进程 1）；
+以此类推，形成了 “进程 3→2→1→0” 的单向数据流动，刚好没卡住
