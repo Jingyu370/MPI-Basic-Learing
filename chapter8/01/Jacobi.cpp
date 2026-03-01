@@ -13,6 +13,8 @@ int main(int argc, char** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &myid);
     MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 
+    MPI_Status status;
+
     int mysize = totalsize / numprocs;
 
     vector<vector<double>> a(mysize + 2, vector<double>(totalsize, 0.0));
@@ -37,7 +39,7 @@ int main(int argc, char** argv){
     for (int n = 0; n < steps; ++n) {
         // 向上接收/向下发送
         if (myid < 3) {
-            MPI_Recv(&a[mysize + 1][0], totalsize, MPI_DOUBLE, myid + 1, 10, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&a[mysize + 1][0], totalsize, MPI_DOUBLE, myid + 1, 10, MPI_COMM_WORLD, &status);
         }
         if (myid > 0) {
             MPI_Send(&a[1][0], totalsize, MPI_DOUBLE, myid - 1, 10, MPI_COMM_WORLD);
@@ -47,7 +49,7 @@ int main(int argc, char** argv){
             MPI_Send(&a[mysize][0], totalsize, MPI_DOUBLE, myid + 1, 10, MPI_COMM_WORLD);
         }
         if (myid > 0) {
-            MPI_Recv(&a[0][0], totalsize, MPI_DOUBLE, myid - 1, 10, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&a[0][0], totalsize, MPI_DOUBLE, myid - 1, 10, MPI_COMM_WORLD, &status);
         }
 
         // 确定计算范围 (排除全局固定边界)
@@ -73,9 +75,9 @@ int main(int argc, char** argv){
 
     // 打印结果 (部分打印)
     for (int i = 1; i <= mysize; ++i) {
-        std::cout << "Rank " << myid << " Row " << i << ": ";
-        for (int j = 0; j < totalsize; ++j) std::cout << a[i][j] << " ";
-        std::cout << std::endl;
+        cout << "Rank " << myid << " Row " << i << ": ";
+        for (int j = 0; j < totalsize; ++j) cout << a[i][j] << " ";
+        cout << endl;
     }
 
     MPI_Finalize();
