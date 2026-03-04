@@ -88,5 +88,7 @@ void Buffered_Test_Send(double* buffer, int buff_size) {
     MPI_Bsend(buffer, 1, MPI_DOUBLE, dest, 2000, MPI_COMM_WORLD);
 
     MPI_Buffer_detach(&bbuffer, &size);
+    
+    //演示：缓存可以重复绑定
     MPI_Buffer_attach(bbuffer, size);
 }
