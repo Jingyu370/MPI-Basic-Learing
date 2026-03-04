@@ -9,11 +9,11 @@ static int dest = 1;
 int main(int argc, char **argv){
     int rank = 0;
     int act_size = 5;
-    int flag, np, rval;
+    int np;
     int count1, count2;
     int buffer[SIZE];
 
-    MPI_Status status, status1, status2;
+    MPI_Status status1, status2;
     MPI_Init(&argc ,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &np);
